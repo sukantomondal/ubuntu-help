@@ -1,0 +1,6 @@
+
+First install dconf-tools
+
+sudo apt-get install dconf-tools
+
+After installation open dconf-editor go to org –> gnome –> nautilus –> preferences and choose always-use-location-entry
