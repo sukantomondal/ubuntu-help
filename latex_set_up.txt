@@ -1,0 +1,19 @@
+https://dzone.com/articles/installing-latex-ubuntu
+
+There are a number of LaTeX distributions you can install on Ubuntu. One such distribution is TeX Live.
+
+    To install Tex Live LaTeX distribution on ubuntu use the following command.
+
+    sudo apt-get install texlive-full
+
+    To edit LaTeX documents we need an editor. There are a number of LaTeX editors you can find. I recommend Texmaker, a cross-platform LaTeX editor. To install Texmaker on Ubuntu use following command.
+
+    sudo apt-get install texmaker
+
+    To open Texmaker on Ubuntu use following command.
+
+    texmaker
+
+
+
+
