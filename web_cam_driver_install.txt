@@ -1,0 +1,17 @@
+cd /etc/local/src
+$ git clone https://github.com/patjak/bcwc_pcie.git
+$ cd bcwc_pcie/firmware
+$ sudo make
+$ sudo make install
+$ cd ..
+$ sudo make
+$ sudo make install   (Update with make install for 18.04) 
+$ sudo depmod
+$ sudo modprobe -r bdc_pci
+$ sudo modprobe facetimehd
+
+
+
+In the top line if the directory does not exit make that directory
+
+git clone may need to run as sudo

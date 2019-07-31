@@ -1,0 +1,13 @@
+runc++file(){
+	g++ $1;
+	if [ -f a.out ]; then
+		./a.out;
+		rm a.out;
+	fi
+}
+
+alias cr='runc++file';
+#alias cr='function run(){ g++ $1; if[ -f ./a.out ]; then ./a.out fi};run'
+#alias cr='function _blah(){echo "First: $1"; };_blah'
+
+
