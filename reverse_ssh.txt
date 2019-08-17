@@ -1,0 +1,189 @@
+https://toic.org/blog/2009/reverse-ssh-port-forwarding/
+
+https://help.ubuntu.com/community/SSH/OpenSSH/PortForwarding
+
+Parent page: Internet and Networking >> SSH
+
+Contents
+
+Introduction
+Types of Port Forwarding
+Local Port Forwarding
+Remote Port Forwarding
+Dynamic Port Forwarding
+Forwarding GUI Programs
+Single Applications
+Port Forwarding Explained
+Troubleshooting
+Introduction
+Port forwarding via SSH (SSH tunneling) creates a secure connection between a local computer and a remote machine through which services can be relayed. Because the connection is encrypted, SSH tunneling is useful for transmitting information that uses an unencrypted protocol, such as IMAP, VNC, or IRC.
+
+Types of Port Forwarding
+SSH's port forwarding feature can smuggle various types of Internet traffic into or out of a network. This can be used to avoid network monitoring or sniffers, or bypass badly configured routers on the Internet. Note: You might also need to change the settings in other programs (like your web browser) in order to circumvent these filters.
+
+IconsPage/warning.png
+
+Warning: Filtering and monitoring is usually implemented for a reason. Even if you don't agree with that reason, your IT department might not take kindly to you flouting their rules.
+
+There are three types of port forwarding with SSH:
+
+Local port forwarding: connections from the SSH client are forwarded via the SSH server, then to a destination server
+
+Remote port forwarding: connections from the SSH server are forwarded via the SSH client, then to a destination server
+
+Dynamic port forwarding: connections from various programs are forwarded via the SSH client, then via the SSH server, and finally to several destination servers
+
+Local port forwarding is the most common type. For example, local port forwarding lets you bypass a company firewall that blocks Wikipedia.
+
+Remote port forwarding is less common. For example, remote port forwarding lets you connect from your SSH server to a computer on your company's intranet.
+
+Dynamic port forwarding is rarely used. For example, dynamic port forwarding lets you bypass a company firewall that blocks web access altogether. Although this is very powerful, it takes a lot of work to set up, and it's usually easier to use local port forwarding for the specific sites you want to access.
+
+Port-forwarding is a widely supported technique and a feature found in all major SSH clients and servers, although not all clients do it the same way. For help on using a specific client, consult the client's documentation. For example, the PuTTY manual has a section on port forwarding in PuTTY.
+
+To use port forwarding, you need to make sure port forwarding is enabled in your server. You also need to tell your client the source and destination port numbers to use. If you're using local or remote forwarding, you need to tell your client the destination server. If you're using dynamic port forwarding, you need to configure your programs to use a SOCKS proxy server. Again, exactly how to do this depends on which SSH client you use, so you may need to consult your documentation.
+
+Local Port Forwarding
+Local port forwarding lets you connect from your local computer to another server. To use local port forwarding, you need to know your destination server, and two port numbers. You should already know your destination server, and for basic uses of port forwarding, you can usually use the port numbers in Wikipedia's list of TCP and UDP port numbers.
+
+For example, say you wanted to connect from your laptop to http://www.ubuntuforums.org using an SSH tunnel. You would use source port number 8080 (the alternate http port), destination port 80 (the http port), and destination server www.ubuntuforums.org. :
+
+
+ssh -L 8080:www.ubuntuforums.org:80 <host>
+Where <host> should be replaced by the name of your laptop. The -L option specifies local port forwarding. For the duration of the SSH session, pointing your browser at http://localhost:8080/ would send you to http://www.ubuntuforums.org/.
+
+In the above example, we used port 8080 for the source port. Ports numbers less than 1024 or greater than 49151 are reserved for the system, and some programs will only work with specific source ports, but otherwise you can use any source port number. For example, you could do:
+
+
+ssh -L 8080:www.ubuntuforums.org:80 -L 12345:ubuntu.com:80 <host>
+This would forward two connections, one to www.ubuntuforums.org, the other to www.ubuntu.com. Pointing your browser at http://localhost:8080/ would download pages from www.ubuntuforums.org, and pointing your browser to http://localhost:12345/ would download pages from www.ubuntu.com.
+
+The destination server can even be the same as the SSH server. For example, you could do:
+
+
+ssh -L 5900:localhost:5900 <host>
+This would forward connections to the shared desktop on your SSH server (if one had been set up). Connecting an SSH client to localhost port 5900 would show the desktop for that computer. The word "localhost" is the computer equivalent of the word "yourself", so the SSH server on your laptop will understand what you mean, whatever the computer's actual name.
+
+Remote Port Forwarding
+Remote port forwarding lets you connect from the remote SSH server to another server. To use remote port forwarding, you need to know your destination server, and two port numbers. You should already know your destination server, and for basic uses of port forwarding, you can usually use the port numbers in Wikipedia's list of TCP and UDP port numbers.
+
+For example, say you wanted to let a friend access your remote desktop, using the command-line SSH client. You would use port number 5900 (the first VNC port), and destination server localhost:
+
+
+ssh -R 5900:localhost:5900 guest@joes-pc
+The -R option specifies remote port forwarding. For the duration of the SSH session, Joe would be able to access your desktop by connecting a VNC client to port 5900 on his computer (if you had set up a shared desktop).
+
+Dynamic Port Forwarding
+Dynamic port forwarding turns your SSH client into a SOCKS proxy server. SOCKS is a little-known but widely-implemented protocol for programs to request any Internet connection through a proxy server. Each program that uses the proxy server needs to be configured specifically, and reconfigured when you stop using the proxy server.
+
+For example, say you wanted Firefox to connect to every web page through your SSH server. First you would use dynamic port forwarding with the default SOCKS port:
+
+
+ssh -C -D 1080 laptop
+The -D option specifies dynamic port forwarding. 1080 is the standard SOCKS port. Although you can use any port number, some programs will only work if you use 1080. -C enables compression, which speeds the tunnel up when proxying mainly text-based information (like web browsing), but can slow it down when proxying binary information (like downloading files).
+
+Next you would tell Firefox to use your proxy:
+
+go to Edit -> Preferences -> Advanced -> Network -> Connection -> Settings...
+
+check "Manual proxy configuration"
+make sure "Use this proxy server for all protocols" is cleared
+clear "HTTP Proxy", "SSL Proxy", "FTP Proxy", and "Gopher Proxy" fields
+enter "127.0.0.1" for "SOCKS Host"
+enter "1080" (or whatever port you chose) for Port.
+You can also set Firefox to use the DNS through that proxy, so even your DNS lookups are secure:
+
+Type in about:config in the Firefox address bar
+Find the key called "network.proxy.socks_remote_dns" and set it to true
+The SOCKS proxy will stop working when you close your SSH session. You will need to change these settings back to normal in order for Firefox to work again.
+
+To make other programs use your SSH proxy server, you will need to configure each program in a similar way.
+
+Forwarding GUI Programs
+SSH can also forward graphical applications over a network, although it can take some work and extra software to forward programs to Windows or Mac OS.
+
+Single Applications
+If you are logging in from a Unix-like operating system, you can forward single applications over SSH very easily, because all Unix-like systems share a common graphics layer called X11. This even works under Mac OS X, although you will need to install and start the X11 server before using SSH.
+
+To forward single applications, connect to your system using the command-line, but add the -X option to forward X11 connections:
+
+
+ssh -X laptop
+Once the connection is made, type the name of your GUI program on the SSH command-line:
+
+
+firefox &
+Your program will start as normal, although you might find it's a little slower than it would be if it were running locally. The trailing & means that the program should run in "background mode", so you can start typing new commands in straight away, rather than waiting for your program to finish.
+
+If you only want to run a single command, you can log in like this:
+
+
+ssh -f -T -X laptop firefox
+That will run Firefox, then exit when it finishes. See the SSH manual page for information about -f and -T.
+
+If you start an application and it complains that it cannot find the display, try installing the xauth package from the Main repository (click here to install xauth). Xauth is installed by default with desktop installations but not server installations.
+
+If you suspect that programs are running slowly because of a lack of bandwith, you can turn SSH compression on with the -C option:
+
+
+ssh -fTXC joe@laptop firefox
+Using -fTXC here is identical to -f -T -X -C.
+
+/%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Bypassing corporate firewall with reverse ssh port forwarding
+Posted by branko | Linux. | Tags: network security ssh
+26
+Probably lots of you are behind some sort of very restrictive corporate firewall. Unable to access your office pc from home because of firewall policies. In normal cases this scenario is more than welcomed. No outsiders should be allowed to access internal parts of secure network! Ideally companies will setup secure VPN access allowing its employees to access their work computers and do some work remotely. What if you aren't one of the lucky ones having such option? You desperately need to access your office pc?
+
+The problem
+/media/filer_public/e8/e7/e8e7562f-b4ed-4b6b-aab7-a1aa89c8c4dc/current.png
+As shown on the picture above, we have our office PC behind very restrictive corporate firewall connected to Internet. Firewall will not allow any traffic originating from Internet to internal networ k except previously initiated traffic. Meaning you can contact remote hosts on Internet from your office PC and they can respond, but remote computers can't initiate connection to your office PC. Thi s is of course huge problem if you have to access your work materials on office PC from your home. Additionally corporate firewall will only allow certain traffic from your office PC to remote hosts. Meaning you can only establish FTP, SSH, HTTP, POP3... communications, all other ports are blocked.
+
+How can you access your office PC then?
+
+One way is to setup corporate VPN access allowing secure connections to internal network. Another method is to setup a port forwarding on corporate firewall so it redirects certain ports to your offi ce PC. But if you don't have the means to accomplish any of this then the only way to do it is to use ssh tunnels and reverse port forwarding.
+
+The solution
+If we can only contact remote hosts on certain ports, the solution would be to contact remote hosts via allowed port and piggyback the connection on already established link.
+
+/media/filer_public/0a/cb/0acb7032-91d1-4b2d-b79f-5044c503385b/reverese-ssh.png
+Something like shown on the picture above. Fortunately we can do this with ssh.
+
+Real life example
+I will assume that home PC is connected via dynamically assigned IP address. First thing you will need to make sure you have ssh server installed on your home PC and it should be accessible from Inte rnet. If you have some NAT routers, be sure to forward port 22 to your home PC. Secondly you will need to setup a dyndns account so you can connect to your home PC regardless of IP address changes. N ow the goal will be to connect to that home ssh server from our office PC.
+
+For the purpose of this example i will name my home PC: bhome.dyndns.com Office computer name will be bwork.office.com bwork computer uses private IP range of 192.168.0.0/24 with address 192.168.0.100
+So if the firewall is preventing outside connections to our bwork computer we must initiate connection from it.
+
+We can do this with simple ssh command:
+
+ssh -R 2210:localhost:22 bhome.dyndns.com
+So what just happened here? We are initiating ssh connection ssh with reverse port forwarding option -R which will then open listening port 2210: who is going to be forwarded back to localhost's port :22 an d all this will happen on remote computer bhome.dyndns.com.
+
+This connection represents the green line in the diagram above, and it's a legit connection as far as corporate firewall is concerned.
+
+Now if weopen up a terminal on bhome computer, and type in:
+
+ssh -p 2210 localhost
+we will try to connect to localhost (bhome.dyndns.com) on port 2210. Since that port is setuped by remote ssh connection it will tunnel the request back via that link to the bwork.office.co m computer. This is the red line on the diagram above. Looking from firewall's perspective it's a legit traffic, since it is responding traffic on already initiated link from bwork c omputer.
+
+Real life example 2
+What if your home computer is not always on-line? Or perhaps you wish to access your office computer from multiple locations? For this you will have to have some dedicated server or VPS outside the c orporate firewall.
+
+/media/filer_public/2e/0d/2e0d1abf-c331-4625-ba0b-efed1c800254/reverese-ssh2.png
+To accomplish this we will use the same command as previously, only this time we will open up a reverse ssh tunnel to remote server or VPS.
+
+For the purpose of this example we will name the server bserver.outside.com with IP 89.xxx.xx.4
+ssh -R 2210:localhost:22 bserver.outside.com
+again this will open up reverse ssh tunnel to the machine 89.xxx.xx.4 (bserver.outside.com). So when we login to the server and issue the command:
+
+ssh -p 2210 localhost
+we will end up with bwork computer's ssh login prompt.
+
+Can I use this previously established reverse ssh tunnel to the server to directly connect to my office computer?
+
+Of course, but some slight modifications are required. By default ssh tunnels only bind to local address, and can be accessible only locally. Meaning, in the example above, you can't just type:
+
+ssh -p 2210 bserver.outside.com
+on your home PC and be connected to your office PC!
