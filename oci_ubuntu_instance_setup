@@ -1,0 +1,8 @@
+sudo iptables --list --line-numbers
+
+sudo iptables -D INPUT 6
+
+go to
+
+/etc/sudoers.d/90-cloud-init-users to add your own user name
+
